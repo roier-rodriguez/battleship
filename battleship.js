@@ -1,5 +1,5 @@
 const LIMIT_SHIP = 5;
-const GAME_SIZE = 10;
+const GAME_SIZE = 12;
 
 function randomNumber() {
   return "@" + Math.round(Math.random() * 100);
@@ -11,7 +11,7 @@ function range(min, max) {
 
 function clearConsole() {
   for(var i = 0; i < process.stdout.getWindowSize()[1]; i++) {
-      console.log('\r\n');
+    console.log('\r\n');
   }
 }
 
@@ -24,9 +24,6 @@ function getRangeField(max, offset) {
       field.push({x: i, y: j});
     }
   }
-  // field.forEach((f, i) => {
-  //   console.log(`${i}: {${f.x}, ${f.y}}`);
-  // });
   const result = [];
   for (let index = 0; index < (maxW * maxH); index++) {
     let pick = range(0, field.length - 1);
@@ -34,9 +31,6 @@ function getRangeField(max, offset) {
     field.splice(pick, 1);
     result.push(fromField);
   }
-  // result.forEach((f, i) => {
-  //   console.log(`${i}: {${f.x}, ${f.y}}`);
-  // });
   return result;
 }
 
@@ -71,7 +65,7 @@ class Game {
   }
 
   printMap () {
-    // clearConsole();
+    //clearConsole();
     let numbers = [];
     for (let index = 1; index <= this.size; index++) {
       numbers.push(index % 10);
@@ -95,7 +89,7 @@ class Game {
                 boat[0] = ship.hp[0];
               }
               if ((ship.coords.y + (ship.size.h - 1)) === index) {
-                boat[0] = ship.hp[0]; // =
+                boat[0] = ship.hp[0];
               }
             }
             line.splice(ship.coords.x - 1, boat.length, ...boat);
@@ -143,21 +137,16 @@ class Ship {
       console.log(`Ship [${this.name}] added here [${this.coords.x}, ${this.coords.y}] as the first ship.`);
       this.added = true;
     } else {
-      // console.log(`ships: ${myPlayer.ships.length}`);
       const ranges = getRangeField(game.size, this.size);
       let rangesIndex = 0;
       let hitAnotherShip = myPlayer.isOverlappingWithShips(this.size, this.coords);
       while (hitAnotherShip && rangesIndex < (ranges.length - 1)) {
-        // console.log(`Ship [${this.name}] is overlapping with [${hitAnotherShip.name}] for the ${rangesIndex} time.`);
         this.coords = ranges[rangesIndex];
-        // console.log(`this.coords`, this.coords, rangesIndex, ranges.length);
-        // console.log(ranges);
         hitAnotherShip = myPlayer.isOverlappingWithShips(this.size, this.coords);
         rangesIndex++;
       }
-      // console.log('ranges', ranges.length);
       if(rangesIndex >= (ranges.length - 1)) {
-        // console.log(`There's no more room for this ship [${this.name}] ${this.added}.`);
+        console.log(`There's no more room for this ship [${this.name}] ${this.added}.`);
       } else {
         if (rangesIndex >= 1) {
           console.log(`Ship [${this.name}] added here [${this.coords.x}, ${this.coords.y}] after trying ${rangesIndex + 1} times.`);
@@ -256,13 +245,9 @@ const game = new Game();
 const player1 = new Player('Nombre Del Player Rodríguez');
 game.addPlayer(player1);
 
-for (let index = 0; index < 4; index++) {
-  // player1.addShip(`SS Anne #${index+1}`);
-  player1.addShip(`SS Anne #${index+1}`, { x: 2, y: 2 });
+for (let index = 0; index < 5; index++) {
+  player1.addShip(`SS Anne #${index+1}`);
 }
-// player1.addShip(`SS Anne #5`, { x: 10, y: 7 }, { w: 1, h: 3 });
-// player1.addShip(`SS Anne #6`, { x: 9, y: 9 }, { w: 3, h: 1 });
-
 
 for (let index = 0; index < 20; index++) {
   game.dropBomb(range(1,game.size), range(1,game.size));
@@ -270,6 +255,3 @@ for (let index = 0; index < 20; index++) {
 
 game.printMap();
 console.log(`\nYou have ${player1.getShips().length} ships.\n`);
-// player1.getShips().forEach((ship) => {
-//   console.log(ship.name, ship.coords, ship.size);
-// });
