@@ -1,0 +1,21 @@
+// 1. Player 
+// 1.2 Launch Missile (ACT) (Coords) 
+// 1.3 Name
+// 1.5 Score
+// 1.6 isActive (bool)
+// 1.6.1 isPlaying (bool)
+// 1.4 Ships (Array)
+//  1.4.1 Ship Coords
+
+// 2. Ship {}
+// 2.1 Size (w, h) const {}
+// 2.1.1 Name
+// 2.2 Coords (x, y) const {}
+// 2.3 HP (String) let
+// 2.4 Player "@001"
+// 3.3 hit (bool) Ship / false "()"
+
+// 3. Game
+// 3.1 Size (int)
+// 3.2 Players (Array)
+
