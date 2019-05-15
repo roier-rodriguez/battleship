@@ -7,7 +7,7 @@ var Battleship = new Game(20);
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', {
-    title: 'Battleship',
+    title: 'Battle Ship 3000',
     size: Battleship.getSize()
   });
 });
