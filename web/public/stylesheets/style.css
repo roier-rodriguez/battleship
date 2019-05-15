@@ -11,7 +11,7 @@ a {
   color: #00B7FF;
 }
 
-.ships {
+#ships {
   margin: 40px auto;
   position: relative;
   display: flex;

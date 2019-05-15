@@ -3,10 +3,7 @@ extends layout
 block content
   h1= title
   p Welcome to the game of #{title}
-  //- div.ships(style="width:"+(size * 20)+"px;height:"+(size * 20)+"px;")
-    for ship in ships
-      div.ship(style="top:" + (ship.coords.y * 20) + "px;left:" + (ship.coords.x * 20) + "px;width:" + (ship.size.w * 20) + "px;height:" + (ship.size.h * 20) + "px;")
-        h5.ship-name= ship.name
+  div#ships(style="width:"+(size * 20)+"px;height:"+(size * 20)+"px;")
   div.controls
     a.button#reset Reset
     input.input#x(type="number" placeholder="X")

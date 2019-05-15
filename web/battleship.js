@@ -52,6 +52,10 @@ class Game {
   getPlayers() {
     return this.players;
   }
+
+  getSize() {
+    return this.size;
+  }
   
   getPlayerByName(playerName) {
     return this.players.find((player) => player.name === playerName);
@@ -61,21 +65,24 @@ class Game {
     return this.getPlayerByName(playerName);
   }
   
-  dropBomb(x, y) {
-    let hit = false;
-    console.log('dropBomb in the backend!');
-    this.players.forEach((player) => {
+  dropBomb(playerLaunchingBombID, x, y) {
+    let hit = [];
+    this.players
+    .filter((player) => player.id !== playerLaunchingBombID)
+    .forEach((player) => {
       player.ships.forEach((ship) => {
         let response = ship.wasHit(x, y);
         if (response) {
-          hit = true;
-          console.log(`${response.name} was hit\t{${x}, ${y}}.`);
+          hit.push(response);
         }
       });
     });
-    if (!hit) {
+    if (!hit.length) {
       console.log(`Bad luck\t{${x}, ${y}}.`);
+    } else {
+      console.log(`Ship hit!\t{${x}, ${y}}.`);
     }
+    return hit;
   }
 
   printMap () {
@@ -214,9 +221,8 @@ class Ship {
   wasHit(x, y) {
     if (this.isDamaged(x, y) >= 0) {
         return {
-          name: this.name,
-          player: this.player,
-          hp: this.hp
+          id: this.id,
+          player: this.player
         };
     }
     return false;

@@ -1,17 +1,27 @@
 var socket = io();
-console.log('segunda linea en el frontend!!!');
+
+var mapSize = 0;
+var ships = [];
 
 var button = document.getElementById('dropBomb');
 button.addEventListener('click', function(){
 
     var x = document.getElementById('x').value || 0;
     var y = document.getElementById('y').value || 0;
-    
-    socket.emit('dropbomb', {x: x, y: y});
+    if (localStorage.getItem('socket.id')) {
+        socket.emit('dropbomb', { id: localStorage.getItem('socket.id'), coords: {x: x, y: y} });
+    } else {
+        console.log(`You need to enter a name first.`);
+    }
 });
 
 socket.on('wasHit', function(wasHit){
-    console.log(`Was hit?: ${wasHit}`);
+    console.log(`Was hit?: `, wasHit);
+});
+
+socket.on('shipHit', function(hit){
+    let ship = ships.find((myShip) => myShip.id === hit.bomb.id);
+    console.log(`your ship ${ship.name} were hit by ${hit.by}`);
 });
 
 socket.on('playerCreated', function(id){
@@ -30,11 +40,39 @@ socket.on('playerNamed', function(id){
 });
 
 if (localStorage.getItem('socket.id')) {
-    socket.emit('get my ships', localStorage.getItem('socket.id'));
+    socket.emit('get my player', localStorage.getItem('socket.id'));
 }
 
-socket.on('here are your ships', function(ships){
-    console.log(`frontend: here are my ships: `, ships);
+socket.on('here is your player', function(player){
+    console.log(`frontend: here is your player: `, player);
+    document.getElementById('name').value = player.name;
+    document.getElementById('name').disabled = true;
+    var shipsContainer = document.getElementById('ships');
+    player.ships.forEach((ship) => {
+        var div = document.createElement('div');
+        div.style.top = + (ship.coords.y * mapSize) + "px";
+        div.style.left = + (ship.coords.x * mapSize) + "px";
+        div.style.width = + (ship.size.w * mapSize) + "px";
+        div.style.height = + (ship.size.h * mapSize) + "px";
+        div.classList.add('ship');
+
+        h5 = document.createElement('h5');
+        h5.innerText = ship.name;
+        h5.classList.add('ship-name');
+        div.appendChild(h5);
+
+        shipsContainer.appendChild(div);
+    });
+    ships = player.ships;
+});
+
+socket.on('here is the size', function(size){
+    console.log(`frontend: here here is the size: `, size);
+    mapSize = size;
+});
+
+socket.on('player with same name', function(){
+    console.log(`frontend: choose a different name`);
 });
 
 var resetButton = document.getElementById('reset');

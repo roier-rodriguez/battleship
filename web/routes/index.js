@@ -2,19 +2,13 @@ var express = require('express');
 var router = express.Router();
 var { Game } = require('../battleship');
 
-var Battleship = new Game(30);
-// var p1 = Battleship.addPlayer('Nombre Del Player Rodríguez');
-// for (let index = 0; index < 5; index++) {
-//   p1.addShip(`SS Anne #${index+1}`, Battleship);
-// }
-// Battleship.printMap();
+var Battleship = new Game(20);
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', {
     title: 'Battleship',
-    // ships:  Battleship.players[0].getShips(),
-    size: Battleship.size
+    size: Battleship.getSize()
   });
 });
 
@@ -31,35 +25,46 @@ router.post('/battleship/reset', function(req, res, next) {
 
 module.exports = function(io) {
 
+  let sockets = {};
+
   io.on('connection', function(socket){
-    
-    console.log('this socket.id is ', socket.id);
-    console.log('this are my players in the game:');
-    console.log(Battleship.getPlayers().map(player => player.getName()));
+
+    socket.emit('here is the size', Battleship.size);
     
     socket.on('playerName', function(name) {
       let id = socket.id;
-      if (Battleship.hasPlayerWithName(name)) {
-        id = Battleship.getPlayerByName(name).getID();
-      } else {
+      if (!Battleship.hasPlayerWithName(name)) {
         Battleship.addPlayer(id);
+        Battleship.getPlayer(id).setName(name);
+        Battleship.getPlayer(id).createShips(Battleship, 5);
+        socket.emit('playerNamed', id);
+        sockets[id] = socket;
+      } else {
+        socket.emit('player with same name');
       }
-      Battleship.getPlayer(id).setName(name);
-      Battleship.getPlayer(id).createShips(Battleship, 5);
-      socket.emit('playerNamed', id);
     });
 
-    socket.on('get my ships', function(id) {
+    socket.on('get my player', function(id) {
       if (Battleship.getPlayer(id)) {
-        let ships = Battleship.getPlayer(id).getShips();
-        socket.emit('here are your ships', ships)
+        socket.emit('here is your player', Battleship.getPlayer(id));
       }
     });
 
-    socket.on('dropbomb', function(coords){
-      
-      socket.emit('wasHit', false);
-
+    socket.on('dropbomb', function(params){
+      if (Battleship.getPlayer(params.id)) {
+        let x = parseInt(params.coords.x);
+        let y = parseInt(params.coords.y);
+        let bombResult = Battleship.dropBomb(params.id, x, y);
+        socket.emit('wasHit', bombResult);
+        console.log('bombResult'); console.log(bombResult);
+        bombResult.forEach((bombSuccess) => {
+          console.log('shipHit!');
+          socket.broadcast.emit('shipHit', {
+            by: Battleship.getPlayer(params.id).getName(),
+            bomb: bombSuccess
+          });
+        });
+      }
     });
 
   });
